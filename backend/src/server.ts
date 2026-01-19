@@ -14,7 +14,23 @@ export async function buildServer() {
 
   await app.register(helmet);
   await app.register(cors, {
-    origin: env.FRONTEND_ORIGIN.split(",").map((o) => o.trim()),
+    origin: (origin, cb) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return cb(null, true);
+      
+      // Allow localhost for development
+      if (origin.includes("localhost")) return cb(null, true);
+      
+      // Allow any vercel.app domain
+      if (origin.endsWith(".vercel.app")) return cb(null, true);
+      
+      // Allow configured origins
+      const allowedOrigins = env.FRONTEND_ORIGIN.split(",").map((o) => o.trim());
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      
+      // Deny others
+      cb(new Error("Not allowed by CORS"), false);
+    },
     credentials: true,
   });
   await app.register(rateLimit, {
