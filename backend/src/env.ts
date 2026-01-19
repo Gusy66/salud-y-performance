@@ -10,7 +10,7 @@ const envSchema = z.object({
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string().email(),
   ORDER_EMAIL_TO: z.string().email(),
-  FRONTEND_ORIGIN: z.string().url(),
+  FRONTEND_ORIGIN: z.string(), // Can be multiple URLs separated by comma
   ADMIN_TOKEN: z.string().min(8),
   PORT: z.string().optional(),
 });
