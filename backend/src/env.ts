@@ -12,6 +12,8 @@ const envSchema = z.object({
   ORDER_EMAIL_TO: z.string().email(),
   FRONTEND_ORIGIN: z.string(), // Can be multiple URLs separated by comma
   ADMIN_TOKEN: z.string().min(8),
+  ADMIN_EMAIL: z.string().email(),
+  ADMIN_PASSWORD: z.string().min(8),
   PORT: z.string().optional(),
 });
 
