@@ -179,7 +179,7 @@ export default function Home() {
         <div className="container">
           <div className="footer__grid">
             <div className="footer__brand">
-              <div className="footer__logo">Vortex Pharma</div>
+              <div className="footer__logo">CleanLabz</div>
               <p className="footer__description">
                 Especialistas em peptídeos de alta qualidade para profissionais de saúde 
                 e pesquisadores. Comprometidos com a excelência e segurança.
@@ -223,7 +223,7 @@ export default function Home() {
           </div>
           
           <div className="footer__bottom">
-            <span>&copy; {new Date().getFullYear()} Vortex Pharma. Todos os direitos reservados.</span>
+            <span>&copy; {new Date().getFullYear()} CleanLabz. Todos os direitos reservados.</span>
             <span>Feito com dedicação para você</span>
           </div>
         </div>

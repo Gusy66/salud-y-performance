@@ -13,7 +13,7 @@ export function Navbar() {
     <header className="nav">
       <div className="container nav__inner">
         <Link href="/" className="logo">
-          Vortex Pharma
+          CleanLabz
         </Link>
         
         <nav className="nav__links">

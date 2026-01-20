@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Vortex Pharma | Peptídeos",
+  title: "CleanLabz | Peptídeos",
   description: "E-commerce de peptídeos com checkout via e-mail.",
 };
 
