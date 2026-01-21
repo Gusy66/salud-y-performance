@@ -176,7 +176,7 @@ function buildCustomerEmailHtml(payload: CheckoutPayload) {
               <p style="margin: 0 0 16px; color: #6b7280; font-size: 14px;">
                 Algum produto incorreto ou dúvida? Responda este e-mail!
               </p>
-              <a href="mailto:vortexpharma1@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #0b0c10 0%, #1a1d24 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px;">
+              <a href="mailto:vendas.cleanlabz@gmail.com" style="display: inline-block; background: linear-gradient(135deg, #0b0c10 0%, #1a1d24 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 14px;">
                 Entrar em Contato
               </a>
             </td>
@@ -189,7 +189,7 @@ function buildCustomerEmailHtml(payload: CheckoutPayload) {
                 Vortex Pharma
               </p>
               <p style="margin: 0; color: rgba(255, 255, 255, 0.6); font-size: 12px;">
-                vortexpharma1@gmail.com
+                vendas.cleanlabz@gmail.com
               </p>
               <p style="margin: 16px 0 0; color: rgba(255, 255, 255, 0.4); font-size: 11px;">
                 Este é um e-mail automático. Por favor, não responda diretamente. Para dúvidas, entre em contato conosco.
@@ -297,7 +297,7 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
     to: payload.email,
     subject: "📦 Confirmação do seu pedido - Vortex Pharma",
     html: customerHtml,
-    replyTo: "vortexpharma1@gmail.com",
+    replyTo: "vendas.cleanlabz@gmail.com",
   });
 
   // E-mail INTERNO para a loja (notificação de novo pedido)

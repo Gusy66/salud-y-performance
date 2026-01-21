@@ -191,7 +191,7 @@ export default function Home() {
               <ul className="footer__links">
                 <li><a href="#produtos">Produtos</a></li>
                 <li><a href="#checkout">Carrinho</a></li>
-                <li><a href="mailto:vortexpharma1@gmail.com">Contato</a></li>
+                <li><a href="mailto:vendas.cleanlabz@gmail.com">Contato</a></li>
               </ul>
             </div>
             
@@ -209,13 +209,13 @@ export default function Home() {
               <h4 className="footer__title">Contato</h4>
               <ul className="footer__links">
                 <li>
-                  <a href="mailto:vortexpharma1@gmail.com">
-                    vortexpharma1@gmail.com
+                  <a href="mailto:vendas.cleanlabz@gmail.com">
+                    vendas.cleanlabz@gmail.com
                   </a>
                 </li>
               </ul>
               <div className="footer__social" style={{ marginTop: '1rem' }}>
-                <a href="mailto:vortexpharma1@gmail.com" aria-label="Email">
+                <a href="mailto:vendas.cleanlabz@gmail.com" aria-label="Email">
                   ✉️
                 </a>
               </div>

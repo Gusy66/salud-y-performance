@@ -56,10 +56,10 @@ No serviço do backend, vá em **Variables** e adicione:
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=vortexpharma1@gmail.com
+SMTP_USER=vendas.cleanlabz@gmail.com
 SMTP_PASS=lzxvkqnyojirturt
-SMTP_FROM=vortexpharma1@gmail.com
-ORDER_EMAIL_TO=vortexpharma1@gmail.com
+SMTP_FROM=vendas.cleanlabz@gmail.com
+ORDER_EMAIL_TO=vendas.cleanlabz@gmail.com
 FRONTEND_ORIGIN=https://seu-frontend.vercel.app
 ADMIN_TOKEN=vortex-admin-2024-prod
 PORT=3333

@@ -19,7 +19,7 @@ export function Navbar() {
         <nav className="nav__links">
           <Link href="#produtos">Produtos</Link>
           <Link href="#checkout">Carrinho</Link>
-          <Link href="mailto:vortexpharma1@gmail.com">Contato</Link>
+          <Link href="mailto:vendas.cleanlabz@gmail.com">Contato</Link>
           <Link href="#checkout" className="nav__cta">
             Fazer Pedido
           </Link>
@@ -38,7 +38,7 @@ export function Navbar() {
         <nav className={`nav__mobile ${isOpen ? 'open' : ''}`}>
           <Link href="#produtos" onClick={closeMenu}>Produtos</Link>
           <Link href="#checkout" onClick={closeMenu}>Carrinho</Link>
-          <Link href="mailto:vortexpharma1@gmail.com" onClick={closeMenu}>Contato</Link>
+          <Link href="mailto:vendas.cleanlabz@gmail.com" onClick={closeMenu}>Contato</Link>
           <Link href="#checkout" className="btn btn--primary btn--full" onClick={closeMenu}>
             Fazer Pedido
           </Link>
