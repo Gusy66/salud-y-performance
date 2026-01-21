@@ -4,6 +4,8 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./admin.module.css";
 
+type ProductStatus = "active" | "soon" | "archived";
+
 interface Product {
   id: string;
   name: string;
@@ -15,12 +17,26 @@ interface Product {
   retailPrice: number;
   wholesalePrice: number;
   wholesaleMinQty: number;
-  status: "active" | "soon" | "archived";
+  status: ProductStatus;
   imageUrl?: string;
   createdAt: string;
 }
 
-const emptyProduct = {
+interface ProductFormData {
+  name: string;
+  slug: string;
+  description: string;
+  category: string;
+  dosage: string;
+  volume: string;
+  retailPrice: number;
+  wholesalePrice: number;
+  wholesaleMinQty: number;
+  status: ProductStatus;
+  imageUrl: string;
+}
+
+const emptyProduct: ProductFormData = {
   name: "",
   slug: "",
   description: "",
@@ -30,7 +46,7 @@ const emptyProduct = {
   retailPrice: 0,
   wholesalePrice: 0,
   wholesaleMinQty: 10,
-  status: "active" as const,
+  status: "active",
   imageUrl: "",
 };
 
