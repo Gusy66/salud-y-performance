@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Product } from "@/lib/types";
 
 type Props = {
@@ -7,6 +8,25 @@ type Props = {
 
 export function ProductGrid({ products, onAdd }: Props) {
   const list = Array.isArray(products) ? products : [];
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return list;
+    return list.filter((product) => {
+      const haystack = [
+        product.name,
+        product.description,
+        product.category,
+        product.dosage,
+        product.volume,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(query);
+    });
+  }, [list, search]);
 
   return (
     <section id="produtos" className="section products-section">
@@ -19,8 +39,34 @@ export function ProductGrid({ products, onAdd }: Props) {
           </p>
         </div>
         
+        <div className="products-search">
+          <div className="products-search__input">
+            <span className="products-search__icon">🔎</span>
+            <input
+              type="search"
+              placeholder="Buscar por nome, categoria ou dosagem..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              aria-label="Buscar produtos"
+            />
+            {search && (
+              <button
+                type="button"
+                className="products-search__clear"
+                onClick={() => setSearch("")}
+                aria-label="Limpar busca"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+          <div className="products-search__meta">
+            {filtered.length} produto{filtered.length === 1 ? "" : "s"}
+          </div>
+        </div>
+
         <div className="products-grid">
-          {list.map((product) => {
+          {filtered.map((product) => {
             const isSoon = product.status === "soon";
             const imageSrc =
               product.imageUrl ?? "/carrossel/Gemini_Generated_Image_dj1l4udj1l4udj1l.png";
@@ -86,6 +132,23 @@ export function ProductGrid({ products, onAdd }: Props) {
               </article>
             );
           })}
+          {filtered.length === 0 && (
+            <div className="products-empty">
+              <strong>Nenhum produto encontrado</strong>
+              <span>
+                Tente buscar por outro termo ou limpe o filtro para ver tudo.
+              </span>
+              {search && (
+                <button
+                  type="button"
+                  className="btn btn--outline"
+                  onClick={() => setSearch("")}
+                >
+                  Ver todos os produtos
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
