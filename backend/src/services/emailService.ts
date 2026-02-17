@@ -4,6 +4,8 @@ import { env } from "../env.js";
 type SendEmailInput = {
   from: string;
   to: string;
+  cc?: string | string[];
+  bcc?: string | string[];
   subject: string;
   html: string;
   replyTo?: string;
@@ -37,6 +39,8 @@ async function sendWithSmtp(input: SendEmailInput) {
   await transport.sendMail({
     from: input.from,
     to: input.to,
+    cc: input.cc,
+    bcc: input.bcc,
     subject: input.subject,
     html: input.html,
     replyTo: input.replyTo,
@@ -47,6 +51,17 @@ async function sendWithResend(input: SendEmailInput) {
   const apiKey = env.RESEND_API_KEY;
   if (!apiKey) throw new Error("RESEND_API_KEY não configurada");
 
+  const cc = input.cc
+    ? Array.isArray(input.cc)
+      ? input.cc
+      : [input.cc]
+    : undefined;
+  const bcc = input.bcc
+    ? Array.isArray(input.bcc)
+      ? input.bcc
+      : [input.bcc]
+    : undefined;
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -56,6 +71,8 @@ async function sendWithResend(input: SendEmailInput) {
     body: JSON.stringify({
       from: input.from,
       to: [input.to],
+      cc,
+      bcc,
       subject: input.subject,
       html: input.html,
       reply_to: input.replyTo,
@@ -123,7 +140,7 @@ function buildCustomerEmailHtml(payload: CheckoutPayload) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confirmação de Pedido - Vortex Pharma</title>
+  <title>Confirmação de Pedido - CleanLabz</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc;">
@@ -135,7 +152,7 @@ function buildCustomerEmailHtml(payload: CheckoutPayload) {
           <tr>
             <td style="background: linear-gradient(135deg, #0b0c10 0%, #1a1d24 100%); padding: 32px 40px; border-radius: 16px 16px 0 0;">
               <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">
-                Vortex Pharma
+                CleanLabz
               </h1>
               <p style="margin: 8px 0 0; color: rgba(255, 255, 255, 0.7); font-size: 14px;">
                 Peptídeos de Alta Qualidade
@@ -250,7 +267,7 @@ function buildCustomerEmailHtml(payload: CheckoutPayload) {
           <tr>
             <td style="background-color: #0b0c10; padding: 24px 40px; border-radius: 0 0 16px 16px;">
               <p style="margin: 0 0 8px; color: #ffffff; font-size: 14px; font-weight: 600;">
-                Vortex Pharma
+                CleanLabz
               </p>
               <p style="margin: 0; color: rgba(255, 255, 255, 0.6); font-size: 12px;">
                 vendas.cleanlabz@gmail.com
@@ -358,9 +375,12 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
   
   try {
     await sendEmail({
-      from: `"Vortex Pharma" <${env.SMTP_FROM}>`,
+      from: `"CleanLabz" <${env.SMTP_FROM}>`,
       to: payload.email,
-      subject: "📦 Confirmação do seu pedido - Vortex Pharma",
+      // Envia uma cópia "oculta" para o e-mail da loja (ex.: vendas)
+      // Assim você sempre recebe a confirmação do cliente também.
+      bcc: env.ORDER_EMAIL_TO,
+      subject: "📦 Confirmação do seu pedido - CleanLabz",
       html: customerHtml,
       replyTo: env.SMTP_FROM,
     });
@@ -369,7 +389,7 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
     const internalHtml = buildInternalEmailHtml(payload);
 
     await sendEmail({
-      from: `"Sistema Vortex Pharma" <${env.SMTP_FROM}>`,
+      from: `"Sistema CleanLabz" <${env.SMTP_FROM}>`,
       to: env.ORDER_EMAIL_TO,
       subject: `🛒 Novo pedido de ${payload.customerName} - R$ ${payload.total.toFixed(2)}`,
       html: internalHtml,
