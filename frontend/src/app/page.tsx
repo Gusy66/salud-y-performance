@@ -94,7 +94,18 @@ export default function Home() {
         }),
       });
       if (!res.ok) throw new Error("Não foi possível enviar o pedido.");
-      setMessage("Pedido enviado com sucesso! Você receberá instruções por e-mail.");
+      const data = (await res.json().catch(() => null)) as
+        | { orderId?: string; total?: number; emailSent?: boolean }
+        | null;
+
+      if (data?.emailSent === false) {
+        setMessage(
+          "Pedido criado, mas o e-mail não foi enviado automaticamente. Se você não receber em alguns minutos, entre em contato conosco.",
+        );
+      } else {
+        setMessage("Pedido enviado com sucesso! Você receberá instruções por e-mail.");
+      }
+
       setCart([]);
     } catch (err) {
       setError((err as Error).message);
