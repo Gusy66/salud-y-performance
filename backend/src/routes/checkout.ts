@@ -71,15 +71,30 @@ export async function checkoutRoutes(app: FastifyInstance) {
       },
     });
 
-    await sendOrderEmail({
-      customerName,
-      email,
-      phone,
-      address,
-      items: enrichedItems,
-      total,
-    });
+    let emailSent = false;
+    try {
+      await sendOrderEmail({
+        customerName,
+        email,
+        phone,
+        address,
+        items: enrichedItems,
+        total,
+      });
 
-    return { orderId: order.id, total };
+      emailSent = true;
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          status: "emailed",
+          emailSentAt: new Date(),
+        },
+      });
+    } catch (err) {
+      // Não derrubar o checkout se SMTP/API falhar (Railway pode bloquear SMTP)
+      request.log.error({ err, orderId: order.id }, "Failed to send order email");
+    }
+
+    return { orderId: order.id, total, emailSent };
   });
 }

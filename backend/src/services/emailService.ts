@@ -1,6 +1,14 @@
 import nodemailer from "nodemailer";
 import { env } from "../env.js";
 
+type SendEmailInput = {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+};
+
 function buildTransport() {
   const port = Number(env.SMTP_PORT);
   const secure =
@@ -21,7 +29,50 @@ function buildTransport() {
   });
 }
 
-const transport = buildTransport();
+let transport: nodemailer.Transporter | null = null;
+
+async function sendWithSmtp(input: SendEmailInput) {
+  if (!transport) transport = buildTransport();
+
+  await transport.sendMail({
+    from: input.from,
+    to: input.to,
+    subject: input.subject,
+    html: input.html,
+    replyTo: input.replyTo,
+  });
+}
+
+async function sendWithResend(input: SendEmailInput) {
+  const apiKey = env.RESEND_API_KEY;
+  if (!apiKey) throw new Error("RESEND_API_KEY não configurada");
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: input.from,
+      to: [input.to],
+      subject: input.subject,
+      html: input.html,
+      reply_to: input.replyTo,
+    }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Resend error: HTTP ${res.status} ${text}`.trim());
+  }
+}
+
+async function sendEmail(input: SendEmailInput) {
+  // Se tiver RESEND_API_KEY, preferir HTTPS (evita bloqueios de SMTP em PaaS)
+  if (env.RESEND_API_KEY) return sendWithResend(input);
+  return sendWithSmtp(input);
+}
 
 type OrderItem = {
   productId: string;
@@ -306,7 +357,7 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
   const customerHtml = buildCustomerEmailHtml(payload);
   
   try {
-    await transport.sendMail({
+    await sendEmail({
       from: `"Vortex Pharma" <${env.SMTP_FROM}>`,
       to: payload.email,
       subject: "📦 Confirmação do seu pedido - Vortex Pharma",
@@ -317,7 +368,7 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
     // E-mail INTERNO para a loja (notificação de novo pedido)
     const internalHtml = buildInternalEmailHtml(payload);
 
-    await transport.sendMail({
+    await sendEmail({
       from: `"Sistema Vortex Pharma" <${env.SMTP_FROM}>`,
       to: env.ORDER_EMAIL_TO,
       subject: `🛒 Novo pedido de ${payload.customerName} - R$ ${payload.total.toFixed(2)}`,

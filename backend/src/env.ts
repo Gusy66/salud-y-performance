@@ -4,6 +4,8 @@ import { z } from "zod";
 const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url().optional(),
+  // Opcional: usar Resend via HTTPS (recomendado em hosts que bloqueiam SMTP)
+  RESEND_API_KEY: z.string().optional(),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.string(),
   SMTP_SECURE: z
