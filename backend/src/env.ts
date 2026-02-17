@@ -6,6 +6,10 @@ const envSchema = z.object({
   REDIS_URL: z.string().url().optional(),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.string(),
+  SMTP_SECURE: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((v) => (v ? v === "true" : undefined)),
   SMTP_USER: z.string(),
   SMTP_PASS: z.string(),
   SMTP_FROM: z.string().email(),

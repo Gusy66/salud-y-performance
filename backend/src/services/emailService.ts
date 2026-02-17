@@ -1,14 +1,27 @@
 import nodemailer from "nodemailer";
 import { env } from "../env.js";
 
-const transport = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: Number(env.SMTP_PORT),
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
-  },
-});
+function buildTransport() {
+  const port = Number(env.SMTP_PORT);
+  const secure =
+    typeof env.SMTP_SECURE === "boolean" ? env.SMTP_SECURE : port === 465;
+
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port,
+    secure,
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+    },
+    // Falhar rápido em ambientes que bloqueiam SMTP
+    connectionTimeout: 12_000,
+    greetingTimeout: 12_000,
+    socketTimeout: 20_000,
+  });
+}
+
+const transport = buildTransport();
 
 type OrderItem = {
   productId: string;
@@ -292,22 +305,29 @@ export async function sendOrderEmail(payload: CheckoutPayload) {
   // E-mail para o CLIENTE (confirmação do pedido)
   const customerHtml = buildCustomerEmailHtml(payload);
   
-  await transport.sendMail({
-    from: `"Vortex Pharma" <${env.SMTP_FROM}>`,
-    to: payload.email,
-    subject: "📦 Confirmação do seu pedido - Vortex Pharma",
-    html: customerHtml,
-    replyTo: "vendas.cleanlabz@gmail.com",
-  });
+  try {
+    await transport.sendMail({
+      from: `"Vortex Pharma" <${env.SMTP_FROM}>`,
+      to: payload.email,
+      subject: "📦 Confirmação do seu pedido - Vortex Pharma",
+      html: customerHtml,
+      replyTo: env.SMTP_FROM,
+    });
 
-  // E-mail INTERNO para a loja (notificação de novo pedido)
-  const internalHtml = buildInternalEmailHtml(payload);
-  
-  await transport.sendMail({
-    from: `"Sistema Vortex Pharma" <${env.SMTP_FROM}>`,
-    to: env.ORDER_EMAIL_TO,
-    subject: `🛒 Novo pedido de ${payload.customerName} - R$ ${payload.total.toFixed(2)}`,
-    html: internalHtml,
-    replyTo: payload.email,
-  });
+    // E-mail INTERNO para a loja (notificação de novo pedido)
+    const internalHtml = buildInternalEmailHtml(payload);
+
+    await transport.sendMail({
+      from: `"Sistema Vortex Pharma" <${env.SMTP_FROM}>`,
+      to: env.ORDER_EMAIL_TO,
+      subject: `🛒 Novo pedido de ${payload.customerName} - R$ ${payload.total.toFixed(2)}`,
+      html: internalHtml,
+      replyTo: payload.email,
+    });
+  } catch (err) {
+    // Log amigável pra identificar bloqueio/timeout/auth no Railway
+    // eslint-disable-next-line no-console
+    console.error("SMTP send failed", err);
+    throw err;
+  }
 }
